@@ -12,11 +12,16 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.content.avinash.fabtrend.Adapter.Movie;
+import com.content.avinash.fabtrend.Adapter.MoviesAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -26,6 +31,9 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,NavigationView.OnNavigationItemSelectedListener{
     private static final int PLACE_PICKER_REQUEST = 1;
@@ -39,6 +47,9 @@ public class MainActivity extends AppCompatActivity  implements GoogleApiClient.
     public FloatingActionButton fab;
     protected String mLatitudeLabel;
     protected String mLongitudeLabel;
+    private List<Movie> movieList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private MoviesAdapter mAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +82,16 @@ public class MainActivity extends AppCompatActivity  implements GoogleApiClient.
             }
         });
 
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+        mAdapter = new MoviesAdapter(movieList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+
+        prepareMovieData();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -81,6 +102,15 @@ public class MainActivity extends AppCompatActivity  implements GoogleApiClient.
         navigationView.setNavigationItemSelectedListener(this);
 
     }
+
+    private void prepareMovieData() {
+        Movie movie = new Movie("Mad Max: Fury Road", "Action & Adventure", "2015");
+        movieList.add(movie);
+
+        mAdapter.notifyDataSetChanged();
+
+    }
+
 
     private synchronized void buildGoogleAPIClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
